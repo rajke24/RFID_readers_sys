@@ -75,8 +75,8 @@ def person(data):
             return "Incorrect argument number! Expected `person add <person-id> <name>`"
 
         person_id = data[2]
-        search = people.search(where('id') == person_id)
-        if not search:
+        found = people.search(where('id') == person_id)
+        if not found:
             people.insert({'id': person_id, 'name': data[3], 'card_id': ''})
             return "Person added successfully!"
 
@@ -87,9 +87,9 @@ def person(data):
             return "Incorrect argument number! Expected `person remove <person-id>`"
 
         person_id = data[2]
-        search = people.search(where('id') == person_id)
-        if search:
-            person_card_id = search[0]['card_id']
+        found = people.search(where('id') == person_id)
+        if found:
+            person_card_id = found[0]['card_id']
             if person_card_id != '':
                 db.table('cards').update({'assigned': False}, where('id') == person_card_id)
             people.remove(where('id') == person_id)
@@ -103,9 +103,9 @@ def person(data):
             return "Incorrect argument number! Expected `person remove <person-id>`"
 
         person_id = data[2]
-        search = people.search(where('id') == person_id)
-        if search:
-            person_card_id = search[0]['card_id']
+        found = people.search(where('id') == person_id)
+        if found:
+            person_card_id = found[0]['card_id']
             if person_card_id != '':
                 db.table('cards').update({'assigned': False}, where('id') == person_card_id)
                 people.update({'card_id': ''}, where('id') == person_id)
@@ -118,8 +118,8 @@ def person(data):
             return "Incorrect argument number! Expected `person assign <person-id>`"
 
         person_id = data[2]
-        search = people.search(where('id') == person_id)
-        if search:
+        found = people.search(where('id') == person_id)
+        if found:
             card_search = db.table('cards').search(where('assigned') == False)
             if card_search[0]:
                 card_id = card_search[0]['id']
@@ -166,8 +166,8 @@ def log(input_data):
         if card_id == '':
             return "No card assigned to person"
 
-        search_card = db.table('cards').search(where('id') == card_id)
-        if not search_card:
+        found_card = db.table('cards').search(where('id') == card_id)
+        if not found_card:
             unknown_logs = db.table('unknown_logs')
             currentDT = datetime.now().strftime(datetime_format)
             unknown_logs.insert({'terminal_id': terminal_id,
@@ -175,8 +175,8 @@ def log(input_data):
                                  'log_time': currentDT})
             return "Unknown card"
 
-        search = logs.search((where('login_time') == '') | (where('logout_time') == ''))
-        if not search:
+        found = logs.search((where('login_time') == '') | (where('logout_time') == ''))
+        if not found:
             login_time = datetime.now().strftime(datetime_format)
             logs.insert({'person_id': person_id,
                          'person_name': person_name,
@@ -190,7 +190,7 @@ def log(input_data):
             logs.update({'logout_time': str(logout_time)}, where('person_id') == person_id)
 
             filename = '_'.join(('logs', person_id)) + '.csv'
-            login_time = search[0]['login_time']
+            login_time = found[0]['login_time']
             csv_row = {'person_id': person_id, 'person_name': person_name,
                         'card_id': card_id, 'terminal_id': terminal_id,
                         'login_time': str(login_time), 'logout_time': str(logout_time)}
