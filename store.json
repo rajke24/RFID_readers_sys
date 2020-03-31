@@ -1,0 +1,36 @@
+{
+    "cards": {
+        "1": {
+            "id": "6A003E3A2C42",
+            "assigned": true
+        },
+        "2": {
+            "id": "840034D5DDB8",
+            "assigned": false
+        },
+        "3": {
+            "id": "6A003E6F556E",
+            "assigned": false
+        },
+        "4": {
+            "id": "840034CD324F",
+            "assigned": false
+        },
+        "5": {
+            "id": "6A003E61AC99",
+            "assigned": false
+        },
+        "6": {
+            "id": "6A003E247E0E",
+            "assigned": false
+        },
+        "7": {
+            "id": "6A003E77BD9E",
+            "assigned": false
+        },
+        "8": {
+            "id": "840034D6CEA8",
+            "assigned": false
+        }
+    }
+}
