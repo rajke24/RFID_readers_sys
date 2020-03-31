@@ -196,12 +196,12 @@ def log(input_data):
                         'login_time': str(login_time), 'logout_time': str(logout_time)}
 
             if not path.exists(filename):
-                with open(filename, 'w') as csv_file:
+                with open(filename, 'w', newline='') as csv_file:
                     csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=",")
                     csv_writer.writeheader()
                     csv_writer.writerow(csv_row)
             else:
-                with open(filename, 'a+') as csv_file:
+                with open(filename, 'a+', newline='') as csv_file:
                     csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=",")
                     csv_writer.writerow(csv_row)
 
