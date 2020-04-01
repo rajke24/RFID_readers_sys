@@ -191,8 +191,7 @@ def log(input_data):
 
             filename = '_'.join(('logs', person_id)) + '.csv'
             login_time = found[0]['login_time']
-            csv_row = {'person_id': person_id, 'person_name': person_name,
-                        'card_id': card_id, 'terminal_id': terminal_id,
+            csv_row = {'terminal_id': terminal_id,
                         'login_time': str(login_time), 'logout_time': str(logout_time)}
 
             if not path.exists(filename):
