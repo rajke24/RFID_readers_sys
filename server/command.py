@@ -1,9 +1,6 @@
 from csv import DictWriter
-from datetime import datetime
 from tinydb import where
-from config import db, datetime_format, fieldnames
-from random import randrange
-from os import path
+from config import db, fieldnames
 
 
 def terminal(input_data):
@@ -136,75 +133,53 @@ def person(data):
     return "No such command!"
 
 
-def log(input_data):
+def log(data):
     logs = db.table('logs')
 
-    if len(input_data) == 1:
-        return "\n\t".join(("Available subcommands:", "list", "read <person-id>"))
+    if len(data) == 1:
+        return "\n\t".join(("Available subcommands:", "list <person-id>", "gencsv <person-id>"))
     
-    if input_data[1] == 'list':
-        return "\n".join(f"{l['login_time']} \t {l['logout_time']}" for l in logs)
+    if data[1] == 'list':
+        if len(data) != 3:
+            return "Incorrect argument number! Expected `log list <person-id>`"
 
-    if input_data[1] == 'read':
-        if len(input_data) != 3:
-            return "Incorrect argument number! Expected `log read <card-id>`"
+        person_id = data[2]
 
-        if len((db.table('terminals'))) == 0:
-            return "Sorry, no terminals to read card"
-        else:
-            random = randrange(len(db.table('terminals'))) - 1
-            terminal_id = db.table('terminals').search(where('id'))[random]['id']
-
-        person_id = input_data[2]
-        person_search = db.table('people').search(where('id') == person_id)
-        if not person_search:
-            return "No such person exists"
-
-        card_id = person_search[0]['card_id']
-        person_name = person_search[0]['name']
-
-        if card_id == '':
-            return "No card assigned to person"
-
-        found_card = db.table('cards').search(where('id') == card_id)
-        if not found_card:
-            unknown_logs = db.table('unknown_logs')
-            currentDT = datetime.now().strftime(datetime_format)
-            unknown_logs.insert({'terminal_id': terminal_id,
-                                 'card_id': card_id,
-                                 'log_time': currentDT})
-            return "Unknown card"
-
-        found = logs.search((where('login_time') == '') | (where('logout_time') == ''))
+        found = db.table('people').search(where('id') == person_id)
         if not found:
-            login_time = datetime.now().strftime(datetime_format)
-            logs.insert({'person_id': person_id,
-                         'person_name': person_name,
-                         'card_id': card_id,
-                         'terminal_id': terminal_id,
-                         'login_time': str(login_time),
-                         'logout_time': ''})
-            return f"Person with ID {person_id} logged in"
-        else:
-            logout_time = datetime.now().strftime(datetime_format)
-            logs.update({'logout_time': str(logout_time)}, where('person_id') == person_id)
+            return "No such person exists!"
 
-            filename = '_'.join(('logs', person_id)) + '.csv'
-            login_time = found[0]['login_time']
-            csv_row = {'terminal_id': terminal_id,
-                        'login_time': str(login_time), 'logout_time': str(logout_time)}
+        found_log = logs.search(where('person_id') == person_id)
+        if found_log:
+            print(f"{'login_time':<19} \t logout_time")
+            return "\n".join(f"{l['login_time']} \t {l['logout_time']}" for l in found_log)
 
-            if not path.exists(filename):
+    if data[1] == 'gencsv':
+        if len(data) != 3:
+            return "Incorrect argument number! Expected `log gencsv <person-id>`"
+
+        person_id = data[2]
+        found = db.table('people').search(where('id') == person_id)
+        if found:
+            found_log = logs.search(where('person_id') == person_id)
+            if found_log:
+                filename = '_'.join(('logs', person_id)) + '.csv'
+
                 with open(filename, 'w', newline='') as csv_file:
-                    csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=",")
+                    csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=',')
                     csv_writer.writeheader()
-                    csv_writer.writerow(csv_row)
-            else:
-                with open(filename, 'a+', newline='') as csv_file:
-                    csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=",")
-                    csv_writer.writerow(csv_row)
+                    for log in found_log:
+                        csv_row = {'terminal_id': log['terminal_id'],
+                                  'login_time': str(log['login_time']),
+                                  'logout_time': str(log['logout_time'])}
+                        csv_writer.writerow(csv_row)
+                return f"{filename} got created."
 
-        return f"Person with ID {person_id} logged out"
+            return "Person has no logs yet."
+
+        return "No such person exsists!"
+
+    return "No such command"
 
 
 def command_line():
