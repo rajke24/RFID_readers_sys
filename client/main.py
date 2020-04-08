@@ -9,7 +9,7 @@ broker = "localhost"
 topic = "andrzejewski/RFID_sys"
 
 
-def readTerminalId():
+def read_terminal_id():
     try:
         file_path = os.path.join(os.path.dirname(__file__), 'terminals_id.txt')
         s = open(file_path, 'r', encoding="utf-8")
@@ -24,7 +24,7 @@ def readTerminalId():
 
 
 def main():
-    terminal_id = readTerminalId()
+    terminal_id = read_terminal_id()
     client = mqtt.Client()
 
     client.connect(broker)

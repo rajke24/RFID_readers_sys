@@ -64,7 +64,7 @@ def update_logs(card_id, terminal_id):
                      (where('logout_time') == '') &
                      (where('card_id') == card_id)):
         logout_time = datetime.now().strftime(datetime_format)
-        logs.update({'logout_time': str(logout_time)}, where('card_id') == card_id)
+        logs.update({'logout_time': str(logout_time)}, (where('card_id') == card_id) & (where('logout_time') == ''))
         return f"Person with ID {person_id} logged out!"
 
     return "Unable to login or logout!"
