@@ -34,14 +34,12 @@ def on_message(client, userdata, msg):
         return
 
     found_card = db.table('cards').search(where('id') == data['card_id'])
-    print(found_card[0]['assigned'])
     if not found_card:
         db.table('unknown_logs').insert({'card_id': data['card_id'],
                                          'terminal_id': data['terminal_id'],
                                          'time': time})
         print(f"Login attempt by unknown card. CardID: {data['card_id']}")
     elif found_card[0]['assigned']:
-        print(data['card_id'])
         print(update_logs(data['card_id'], data['terminal_id']))
     else:
         print(f"Login attempt by unassigned card. CardID: {data['card_id']}")
