@@ -3,7 +3,7 @@ import time
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from tinydb import where
-from config import db, broker, topic, datetime_format
+from config import db, datetime_format, BROKER, TOPIC, PORT, CA_CRT_PATH, USERNAME, PASSWORD
 from command import command_line
 
 client = mqtt.Client()
@@ -15,10 +15,12 @@ def disconnect():
 
 
 def connect_to_broker():
-    client.connect(broker)
+    client.tls_set(CA_CRT_PATH)
+    client.username_pw_set(username=USERNAME, password=PASSWORD)
+    client.connect(BROKER, PORT)
     client.on_message = on_message
     client.loop_start()
-    client.subscribe(topic)
+    client.subscribe(TOPIC)
 
 
 def on_message(client, userdata, msg):

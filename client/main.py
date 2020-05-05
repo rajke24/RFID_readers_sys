@@ -4,9 +4,7 @@ import paho.mqtt.client as mqtt
 import os
 import time
 import json
-
-broker = "localhost"
-topic = "andrzejewski/RFID_sys"
+from config import TOPIC, BROKER, CA_CRT_PATH, PORT, USERNAME, PASSWORD
 
 
 def read_terminal_id():
@@ -27,7 +25,9 @@ def main():
     terminal_id = read_terminal_id()
     client = mqtt.Client()
 
-    client.connect(broker)
+    client.tls_set(CA_CRT_PATH)
+    client.username_pw_set(username=USERNAME, password=PASSWORD)
+    client.connect(BROKER, PORT)
 
     while not client.is_connected:
         time.sleep(1)
@@ -40,7 +40,7 @@ def main():
         if data == 'exit':
             break
 
-        client.publish(topic, json.dumps({'card_id': data, 'terminal_id': terminal_id}))
+        client.publish(TOPIC, json.dumps({'card_id': data, 'terminal_id': terminal_id}))
 
     # client.disconnect()
 
