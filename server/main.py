@@ -1,5 +1,4 @@
 import json
-import time
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from tinydb import where
@@ -10,7 +9,6 @@ client = mqtt.Client()
 
 
 def disconnect():
-    time.sleep(4)
     client.loop_stop()
 
 
@@ -18,9 +16,17 @@ def connect_to_broker():
     client.tls_set(CA_CRT_PATH)
     client.username_pw_set(username=USERNAME, password=PASSWORD)
     client.connect(BROKER, PORT)
+    client.on_connect = on_connect
     client.on_message = on_message
     client.loop_start()
     client.subscribe(TOPIC)
+
+
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Server is running...")
+    else:
+        print("Bad connection, Returned code=", rc)
 
 
 def on_message(client, userdata, msg):
@@ -74,9 +80,6 @@ def update_logs(card_id, terminal_id):
 
 def main():
     connect_to_broker()
-    while not client.is_connected:
-        time.sleep(1)
-
     command_line()
     disconnect()
 
