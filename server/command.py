@@ -64,6 +64,19 @@ def cards(input_data):
             return 'Card added successfully !'
         return 'Card already exists!'
 
+    if input_data[1] == 'remove':
+        if len(input_data) != 3:
+            return "Incorrect argument number! Expected `card remove <card-id>`"
+
+        card_id = input_data[2]
+        found = cards.search(where('id') == card_id)
+        if found:
+            if not found[0]['assigned']:
+                cards.remove(where('id') == card_id)
+                return 'Card removed successfully!'
+            return 'Unable to remove card assigned to a person!'
+        return 'No such card exists!'
+
     return "No such command"
 
 
