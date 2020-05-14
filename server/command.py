@@ -62,6 +62,7 @@ def cards(input_data):
         if not found:
             cards.insert({'id': card_id, 'assigned': False})
             return 'Card added successfully !'
+        return 'Card already exists!'
 
     return "No such command"
 
