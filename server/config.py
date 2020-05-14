@@ -7,7 +7,7 @@ PORT = 8883
 USERNAME = 'server'
 PASSWORD = 'server'
 
-fieldnames = ['terminal_id', 'login_time', 'logout_time']
+fieldnames = ['terminal id', 'login time', 'logout time', 'working time']
 datetime_format = '%Y-%m-%d %H:%M:%S'
 
 db = TinyDB("store.json", indent=4)

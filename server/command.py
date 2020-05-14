@@ -1,6 +1,7 @@
 from csv import DictWriter
 from tinydb import where
-from config import db, fieldnames
+from datetime import datetime
+from config import db, fieldnames, datetime_format
 
 
 def terminal(input_data):
@@ -192,10 +193,18 @@ def log(data):
                 with open(filename, 'w', newline='') as csv_file:
                     csv_writer = DictWriter(csv_file, fieldnames=fieldnames, delimiter=',')
                     csv_writer.writeheader()
+
                     for log in found_log:
-                        csv_row = {'terminal_id': log['terminal_id'],
-                                  'login_time': str(log['login_time']),
-                                  'logout_time': str(log['logout_time'])}
+                        login_time = datetime.strptime(log['login_time'], datetime_format)
+                        working_time = ''
+                        if log['logout_time']:
+                            logout_time = datetime.strptime(log['logout_time'], datetime_format)
+                            working_time = ':'.join((str(logout_time.hour - login_time.hour) + 'h', str(logout_time.minute - login_time.minute) + 'm',
+                                                       str(logout_time.second - login_time.second) + 's'))
+                        csv_row = {'terminal id': log['terminal_id'],
+                                  'login time': log['login_time'],
+                                  'logout time': log['logout_time'],
+                                   'working time': working_time}
                         csv_writer.writerow(csv_row)
                 return f"{filename} got created."
 
