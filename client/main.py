@@ -33,6 +33,7 @@ def main():
         time.sleep(1)
 
     while True:
+        print('Insert card ID: ', end='')
         data = input()
         if len(data) == 0:
             continue
