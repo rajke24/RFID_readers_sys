@@ -47,11 +47,21 @@ def terminal(input_data):
 def cards(input_data):
     cards = db.table('cards')
     if len(input_data) == 1:
-        return "\n\t".join(('Available subcommands:', 'list'))
+        return "\n\t".join(('Available subcommands:', 'list', 'add <card-id>', 'remove <card-id>'))
 
     if input_data[1] == 'list':
         print("{:<17}".format("CardID") + "Assigned")
         return "\n".join(f"{c['id']} \t {c['assigned']}" for c in cards)
+
+    if input_data[1] == 'add':
+        if len(input_data) != 3:
+            return "Incorrect argument number! Expected `card add <card-id>`"
+
+        card_id = input_data[2]
+        found = cards.search(where('id') == card_id)
+        if not found:
+            cards.insert({'id': card_id, 'assigned': False})
+            return 'Card added successfully !'
 
     return "No such command"
 
@@ -187,6 +197,7 @@ def command_line():
     input_data = input().split()
 
     if len(input_data) == 0:
+
         return command_line()
 
     if input_data[0] == 'terminal':
