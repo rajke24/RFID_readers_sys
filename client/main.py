@@ -1,5 +1,3 @@
-# import lib.rfid.MFRC522 as MFRC522
-
 import paho.mqtt.client as mqtt
 import os
 import time
@@ -10,9 +8,8 @@ from config import TOPIC, BROKER, CA_CRT_PATH, PORT, USERNAME, PASSWORD
 def read_terminal_id():
     try:
         file_path = os.path.join(os.path.dirname(__file__), 'terminals_id.txt')
-        s = open(file_path, 'r', encoding="utf-8")
-        terminal_id = s.read(12)
-        s.close()
+        with open(file_path) as f:
+            terminal_id = f.read(12)
         print('Using terminal_id -', terminal_id)
         return terminal_id
     except Exception as exc:
@@ -23,18 +20,21 @@ def read_terminal_id():
 
 def main():
     terminal_id = read_terminal_id()
+    # creating mqtt.Client instance
     client = mqtt.Client()
-
+    # configure network encryption, enable TLS/SSL support
     client.tls_set(CA_CRT_PATH)
+    # set a username and a password for broker authentication
     client.username_pw_set(username=USERNAME, password=PASSWORD)
+    # connect client to a broker and to the network port of the server host
     client.connect(BROKER, PORT)
 
     while not client.is_connected:
         time.sleep(1)
 
+    # insert card ID and publish its id and terminal id to a server until inserted data != 'exit'
     while True:
-        print('Insert card ID: ', end='')
-        data = input()
+        data = input("Insert your card: ")
         if len(data) == 0:
             continue
 
@@ -42,17 +42,6 @@ def main():
             break
 
         client.publish(TOPIC, json.dumps({'card_id': data, 'terminal_id': terminal_id}))
-
-    # client.disconnect()
-
-    # MIFAREReader = MFRC522.MFRC522()
-    # while True:
-    #     (status, _) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
-    #     if status == MIFAREReader.MI_OK:
-    #         (status, uid) = MIFAREReader.MFRC522_Anticoll()
-    #         if status == MIFAREReader.MI_OK:
-    #             card_id = ''.join(uid)
-    #             client.publish(topic, json.dumps({ 'card_id': card_id, 'terminal_id': terminal_id}))
 
 
 if __name__ == "__main__":
